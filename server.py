@@ -55,7 +55,7 @@ rightDutyCycle = 0
 ip = ni.ifaddresses(WIFI_INTERFACE)[ni.AF_INET][0]['addr']
 print(ip) 
 
-conn, sock, addr = init_connection(ip, SERVER_PORT)
+sock, conn, addr = init_connection(ip, SERVER_PORT)
 print("success")
 
 
