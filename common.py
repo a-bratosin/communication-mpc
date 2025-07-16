@@ -20,4 +20,9 @@ class CommandData:
     rightMotorOrientation: int # pt direcție (1 în față, -1 în spate)
     leftMotorTuration: float # aici ar fi probabil cv valoare de la 0 la 1 pt pwn
     leftMotorOrientation: int # pt direcție (1 în față, -1 în spate)
-    
+
+@dataclass
+class CommandDataArray:
+    dt: float #eșantionul de timp pt fiecare comandă în parte
+    commandNumber: int #nr de comenzi din array
+    commandArray: list[CommandData]
