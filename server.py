@@ -77,8 +77,8 @@ while True:
         leftPwm.ChangeDutyCycle(leftDutyCycle)
         rightPwm.ChangeDutyCycle(leftDutyCycle)
 
-        GPIO.setmode(MOTOR_PINS["leftCtrl"], input_data.leftMotorOrientation) # 1 sau 0
-        GPIO.setmode(MOTOR_PINS["rightCtrl"], input_data.rightMotorOrientation)
+        GPIO.output(MOTOR_PINS["leftCtrl"], input_data.leftMotorOrientation) # 1 sau 0
+        GPIO.output(MOTOR_PINS["rightCtrl"], input_data.rightMotorOrientation)
         sleep(input_data_array.dt)
 
 
