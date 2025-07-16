@@ -5,7 +5,7 @@ import socket
 from time import sleep
 import netifaces as ni
 import RPi.GPIO as GPIO
-
+import pickle
 SERVER_PORT = 5010
 WIFI_INTERFACE = 'wlan0' # numele interfeței de rețea pe care se conectează placa, necesar pt a afla adresa IP asignată plăcii
 
@@ -26,7 +26,7 @@ MOTOR_PINS = {
     'leftCtrl': 17,
     'leftPwm': 27,
     'rightCtrl': 22,
-    'rightPwm': 24
+    'rightPwm': 23
 }
 
 
@@ -62,12 +62,12 @@ print("success")
 
 while True:
     # insert sensing stuff here
-    sensor_data = "test"
+    sensor_data = "test".encode()
     conn.send(sensor_data)
 
-    input_data_array: CommandDataArray
-    input_data_array = conn.recv(COMMAND_BUF_SIZE)
-
+    
+    encoded_input_data_array = conn.recv(COMMAND_BUF_SIZE)
+    input_data_array = pickle.loads(encoded_input_data_array) 
     # pentru fiecare input din array, pornește pinii corespunzători, și menține acea comandă pentru dt secunde/milisecunde
     for input_data in input_data_array.commandArray:
 

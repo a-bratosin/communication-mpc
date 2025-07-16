@@ -12,7 +12,9 @@
 from common import *
 import socket
 import sys
-import regex
+from time import sleep
+import pickle
+
 
 def init_connection(host_ip, port):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -56,18 +58,20 @@ sock = init_connection(HOST_IP, HOST_PORT)
 
 # aici ar veni partea de generare de traiectorie
 
-
+sock.recv(SENSOR_BUF_SIZE)
+sleep(1000)
 while True:
     # aici e placeholder, momentan nu fac nimica cu data
     sensor_data = sock.recv(SENSOR_BUF_SIZE)
     print(sensor_data)
 
-    data: CommandDataArray
     
     num_commands = input("enter number of commands")
-    data.commandNumber = int(num_commands)
+    num_commands= int(num_commands)
 
-    data.dt = float("enter command interval")
+    dt = float("enter command interval")
+
+    data = CommandDataArray(dt, num_commands, [])
     for i in range(num_commands):
         
         command_str= input("insert command at moment " + i)
@@ -83,15 +87,16 @@ while True:
             int2 = int(parts[3])
             
             command = CommandData(leftMotorTuration=float1, leftMotorOrientation=int1, rightMotorTuration=float2, rightMotorOrientation=int2)
-            data.commandArray[i] = command
+            data.commandArray.append = command
 
         except ValueError:
             print("Invalid values. Please enter: [float] [int] [float] [int]")
             i-=1
             continue
     
-
-    send_command(sock, data)        
+    
+    encoded_data = pickle.dumps(data)
+    send_command(sock, encoded_data)        
 
     # clientul (laptopul), așteaptă date de la senzori, face calculele, trimite la server (placă) comanda, rinse and repeat
 
