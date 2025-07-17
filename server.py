@@ -4,7 +4,7 @@ from common import *
 import socket
 from time import sleep
 import netifaces as ni
-import RPi.GPIO as GPIO
+from gpiozero import PWMOutputDevice, OutputDevice
 import pickle
 SERVER_PORT = 5010
 WIFI_INTERFACE = 'wlan0' # numele interfeței de rețea pe care se conectează placa, necesar pt a afla adresa IP asignată plăcii
@@ -42,11 +42,10 @@ def init_connection(host_ip, port):
 
 # gpio init
 
-GPIO.setmode(GPIO.BCM)
-for pin in MOTOR_PINS.values():
-    GPIO.setup(pin, GPIO.OUT)
-leftPwm = GPIO.PWM(MOTOR_PINS["leftPwm"], 100)
-rightPwm = GPIO.PWM(MOTOR_PINS["rightPwm"], 100)
+leftPwm = PWMOutputDevice(MOTOR_PINS["leftPwm"])
+rightPwm = PWMOutputDevice(MOTOR_PINS["rightPwm"])
+leftOrientation = OutputDevice(MOTOR_PINS["leftCtrl"])
+rightOrientation = OutputDevice(MOTOR_PINS["rightCtrl"])
 leftDutyCycle = 0
 rightDutyCycle = 0
 
@@ -59,28 +58,30 @@ sock, conn, addr = init_connection(ip, SERVER_PORT)
 print("success")
 
 
+try:
+    while True:
+        # insert sensing stuff here
+        sensor_data = "test".encode()
+        conn.send(sensor_data)
 
-while True:
-    # insert sensing stuff here
-    sensor_data = "test".encode()
-    conn.send(sensor_data)
-
-    
-    encoded_input_data_array = conn.recv(COMMAND_BUF_SIZE)
-    input_data_array = pickle.loads(encoded_input_data_array) 
-    # pentru fiecare input din array, pornește pinii corespunzători, și menține acea comandă pentru dt secunde/milisecunde
-    for input_data in input_data_array.commandArray:
-
-        leftDutyCycle = input_data.leftMotorTuration
-        rightDutyCycle = input_data.rightMotorTuration
         
-        leftPwm.ChangeDutyCycle(leftDutyCycle)
-        rightPwm.ChangeDutyCycle(leftDutyCycle)
+        encoded_input_data_array = conn.recv(COMMAND_BUF_SIZE)
+        input_data_array = pickle.loads(encoded_input_data_array) 
+        # pentru fiecare input din array, pornește pinii corespunzători, și menține acea comandă pentru dt secunde/milisecunde
+        for input_data in input_data_array.commandArray:
 
-        GPIO.output(MOTOR_PINS["leftCtrl"], input_data.leftMotorOrientation) # 1 sau 0
-        GPIO.output(MOTOR_PINS["rightCtrl"], input_data.rightMotorOrientation)
-        sleep(input_data_array.dt)
+            leftDutyCycle = input_data.leftMotorTuration
+            rightDutyCycle = input_data.rightMotorTuration
+            
+            leftPwm.value = leftDutyCycle
+            rightPwm.value = rightDutyCycle
 
+            leftOrientation = input_data.leftMotorOrientation
+            rightOrientation = input_data.rightMotorOrientation
+            sleep(input_data_array.dt)
+except Exception as exception:
+    print("exception " + type(exception).__name__ + " raised, shutting down")
+    conn.close()
 
 
 

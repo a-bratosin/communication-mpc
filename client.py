@@ -64,19 +64,20 @@ while True:
     print(sensor_data)
 
     
-    num_commands = input("enter number of commands")
+    num_commands = input("Enter number of commands: ")
     num_commands= int(num_commands)
 
-    dt = float(input("enter command interval"))
+    dt = float(input("Enter time interval between commands: "))
 
     data = CommandDataArray(dt, num_commands, [])
     for i in range(num_commands):
         
-        command_str= input("insert command at moment " + str(i))
+        command_str= input("Insert command at moment " + str(i) +": ")
 
         parts = command_str.strip().split()
         if len(parts) != 4:
             print("Invalid command format. Please enter: [float] [int] [float] [int]")
+            i-=1
             continue
         try:
             float1 = float(parts[0])
@@ -94,8 +95,8 @@ while True:
     
     
     encoded_data = pickle.dumps(data)
-    with open('filename.pickle', 'wb') as handle:
-        pickle.dump(encoded_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    #with open('filename.pickle', 'wb') as handle:
+    #    pickle.dump(encoded_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
     send_command(sock, encoded_data)        
 
     # clientul (laptopul), așteaptă date de la senzori, face calculele, trimite la server (placă) comanda, rinse and repeat

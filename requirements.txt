@@ -1,2 +1,2 @@
 netifaces
-RPi.GPIO
+gpiozero
