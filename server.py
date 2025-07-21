@@ -10,8 +10,8 @@ WIFI_INTERFACE = 'wlan0'
 
 # Pini: 2 PWM + 4 direcție
 MOTOR_PINS = {
-    'leftPwm': 13,        # ENA
-    'rightPwm': 16,       # ENB
+    'leftPwm': 13,        # ENB
+    'rightPwm': 16,       # ENA
     'leftForward': 17,    # IN1
     'leftBackward': 27,   # IN2
     'rightForward': 23,   # IN3
