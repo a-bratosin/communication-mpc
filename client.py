@@ -14,7 +14,9 @@ import socket
 import sys
 from time import sleep
 import pickle
-
+import numpy
+import scipy.io as sio
+import matplotlib.pyplot as plt
 
 def init_connection(host_ip, port):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -27,12 +29,54 @@ def init_connection(host_ip, port):
 
     return sock
 
+def read_trajectory_data():
+    traj_filepath = input("Introdu calea fișierului .mat în care este stocată traiectoria:")
+    try:
+        data_file = sio.loadmat(traj_filepath)
+
+        Ts = data_file.get('Ts')
+        xsim = data_file.get('xsim')
+        # dacă nu sunt citite bine date din data_file, atunci doar o să returneze un obiect de tip NoneType
+        # asta a trebuit să verific cu if-urile astea
+
+        if(type(Ts) == type(None)):
+            print("Nu a putut fi citită variabila Ts!")
+            sys.exit(0)
+        if(type(xsim) == type(None)):
+            print("Nu a putut fi citită variabila Ts!")
+            sys.exit(0)
+
+        return xsim, Ts
+    except FileNotFoundError:
+        print("Fișierul nu a putut fi găsit la calea introdusă!")    
+        sys.exit(0)
+
+        
+    except Exception as e:
+        print("exception " + type(e).__name__ + " raised, shutting down")
+        sys.exit(0)
+
+
+
 def send_command(sock, data):
     sock.send(data)
 
 # GPIO init
 
-# TCP socket init
+
+# aici ar veni partea de generare de traiectorie
+
+xsim,Ts = read_trajectory_data()
+
+
+# pt debug
+answer = input("Doriți să afișați traiectoria aleasă? (y/N)")
+if(answer == 'y'):
+    plt.plot(xsim[0, :], xsim[1,:])
+    plt.show()
+
+
+
 
 num_args = len(sys.argv)
 if(num_args != 3):
@@ -56,7 +100,7 @@ HOST_PORT = int(HOST_PORT)
 sock = init_connection(HOST_IP, HOST_PORT)
 
 
-# aici ar veni partea de generare de traiectorie
+
 
 while True:
     # aici e placeholder, momentan nu fac nimica cu data
